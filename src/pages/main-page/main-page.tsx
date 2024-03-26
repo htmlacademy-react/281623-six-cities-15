@@ -1,32 +1,49 @@
 import { useState } from 'react';
 import Logo from '../../componets/logo/logo';
 import OfferCard from '../../componets/offer-card/offer-card';
-import { TOffer } from '../../types/types';
+import {TOffer } from '../../types/types';
 import { Nullable } from 'vitest';
-//import Map from '../../componets/map/map';
-import { useAppDispatch, useAppSelector } from '../../hooks/store';
-import { CITIES_LOCATION } from '../../const';
-import { Link } from 'react-router-dom';
+import Map from '../../componets/map/map';
+import {useAppSelector } from '../../hooks/store';
+import { CITIES_LOCATION, SortOption} from '../../const';
 import classNames from 'classnames';
-import { AppRoute } from '../../app/router/router/router';
-import { offersActions, offersSelectors } from '../../store/slices/slice';
+import { offersSelectors } from '../../store/slices/slice';
+import Sort from '../../componets/sort/sort-main';
+import LocationsCity from '../../componets/locations-city/locations-city';
 
 
 export default function MainPage (): JSX.Element {
-  const [/*activeOffer*/, setActiveOffer] = useState<Nullable<TOffer>>(null);
+  const [activeOffer, setActiveOffer] = useState<Nullable<TOffer>>(null);
+  const [activeSort, setActiveSort] = useState(SortOption.Popular);
   const handleHover = (offer?: TOffer) => {
     setActiveOffer(offer || null);
   };
 
   const offers = useAppSelector(offersSelectors.offers);
-  const currentCity = useAppSelector(offersSelectors.city);
+  const currentCity = useAppSelector(offersSelectors.currentCity);
 
 
-  const dispatch = useAppDispatch();
+  //const dispatch = useAppDispatch();
 
-  const currentOffers = offers.filter((offer) => offer.city.name === currentCity);
 
-  const isEmty = currentOffers.length === 0;
+  const currentOffers = offers.filter((offer) => offer.city.name === currentCity.name);
+
+  const isEmpty = currentOffers.length === 0;
+
+  let sortedOffers = currentOffers;
+
+  if (activeSort === SortOption.PriceLowHigh) {
+    sortedOffers = currentOffers.toSorted((a,b) => a.price - b.price);
+  }
+
+  if (activeSort === SortOption.PriceHighLow) {
+    sortedOffers = currentOffers.toSorted((a,b) => b.price - a.price);
+  }
+
+  if (activeSort === SortOption.TopRated) {
+    sortedOffers = currentOffers.toSorted((a,b) => b.rating - a.rating);
+  }
+
 
   return (
     <div className="page page--gray page--main">
@@ -60,26 +77,18 @@ export default function MainPage (): JSX.Element {
           </div>
         </div>
       </header>
-      <main className={classNames('page__main', 'page__main--index', {'page__main--index-empty': isEmty})}>
+      <main className={classNames('page__main', 'page__main--index', {'page__main--index-empty': isEmpty})}>
         <h1 className="visually-hidden">Cities</h1>
         <div className="tabs">
           <section className="locations container">
             <ul className="locations__list tabs__list">
-              {CITIES_LOCATION.map((city) => (
-                <li className="locations__item" key={city.name}>
-                  <Link
-                    className={classNames('locations__item-link', 'tabs__item',{'tabs__item--active':
-                currentCity === city.name})}
-                    onClick={(evt) => {
-                      evt.preventDefault();
-                      dispatch(offersActions.setCity(city.name));
-                    }}
-                    to={AppRoute.Main}
-                  >
-                    <span>{city.name}</span>
-                  </Link>
-                </li>
-              ))}
+              {CITIES_LOCATION.map((city) =>
+                (
+                  <LocationsCity
+                    key={city.name}
+                    currentCity= {currentCity}
+                  />
+                ))}
             </ul>
           </section>
         </div>
@@ -88,37 +97,12 @@ export default function MainPage (): JSX.Element {
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
               <b className="places__found">
-                {offers.length} place{offers.length > 1 && 's'} to stay in Amsterdam
+                {currentOffers.length} place{currentOffers.length > 1 && 's'} to stay in {currentCity.name}
               </b>
-              <form className="places__sorting" action="#" method="get">
-                <span className="places__sorting-caption">Sort by</span>
-                <span className="places__sorting-type" tabIndex={0}>
-              Popular
-                  <svg className="places__sorting-arrow" width={7} height={4}>
-                    <use xlinkHref="#icon-arrow-select" />
-                  </svg>
-                </span>
-                <ul className="places__options places__options--custom places__options--opened">
-                  <li
-                    className="places__option places__option--active"
-                    tabIndex={0}
-                  >
-                Popular
-                  </li>
-                  <li className="places__option" tabIndex={0}>
-                Price: low to high
-                  </li>
-                  <li className="places__option" tabIndex={0}>
-                Price: high to low
-                  </li>
-                  <li className="places__option" tabIndex={0}>
-                Top rated first
-                  </li>
-                </ul>
-              </form>
+              <Sort current={activeSort} setter={setActiveSort} />
               <div className="cities__places-list places__list tabs__content">
                 {
-                  offers.length > 0 && offers.map((offer) => (
+                  sortedOffers.length > 0 && sortedOffers.map((offer) => (
                     <OfferCard
                       key={offer.id}
                       offer = {offer}
@@ -128,12 +112,12 @@ export default function MainPage (): JSX.Element {
               </div>
             </section>
             <div className="cities__right-section">
-              {/* <Map
+              <Map
                 className='cities__map'
-                currentCity={currentCity}
-                offers={offers}
+                city={currentCity}
+                offers={currentOffers}
                 activeOffer={activeOffer}
-              /> */}
+              />
             </div>
           </div>
         </div>
@@ -142,3 +126,5 @@ export default function MainPage (): JSX.Element {
 
   );
 }
+
+

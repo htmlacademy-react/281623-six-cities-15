@@ -7,6 +7,8 @@ import Map from '../../componets/map/map';
 import { useAppSelector } from '../../hooks/store';
 import { offersSelectors } from '../../store/slices/slice';
 import { TComment } from '../../types/types';
+import { getRatingStars } from '../../util';
+import { MAX_RATING } from '../../const';
 
 type OfferPageProps = {
   comments: TComment[];
@@ -19,13 +21,13 @@ export default function OfferPage ({comments, authorizationStatus}: OfferPagePro
   const offers = useAppSelector(offersSelectors.offers);
 
   const offerId = offers.find((offer) => offer.id === id);
-  //const currentCity = useAppSelector(offersSelectors.city);
+  const currentCity = useAppSelector(offersSelectors.currentCity);
 
   if (!offerId) {
     return <NotFoundPage/>;
   }
 
-  const {images, rating, type, bedrooms, price, maxAdults, title, city} = offerId;
+  const {images, rating, type, bedrooms, price, maxAdults, title, isPremium, description} = offerId;
   const {name, avatarUrl, isPro} = offerId.host;
 
   return (
@@ -81,12 +83,10 @@ export default function OfferPage ({comments, authorizationStatus}: OfferPagePro
           </div>
           <div className="offer__container container">
             <div className="offer__wrapper">
-              <div className="offer__mark">
-                <span>Premium</span>
-              </div>
+              {isPremium ? <div className="place-card__mark"><span>Premium</span></div> : null}
               <div className="offer__name-wrapper">
                 <h1 className="offer__name">
-              Beautiful &amp; luxurious studio at great location
+                  {title}
                 </h1>
                 <button className="offer__bookmark-button button" type="button">
                   <svg className="offer__bookmark-icon" width={31} height={33}>
@@ -97,7 +97,7 @@ export default function OfferPage ({comments, authorizationStatus}: OfferPagePro
               </div>
               <div className="offer__rating rating">
                 <div className="offer__stars rating__stars">
-                  <span style={{ width: '80%' }} />
+                  <span style={{ width: `${getRatingStars(rating, MAX_RATING)}%` }} />
                   <span className="visually-hidden">Rating</span>
                 </div>
                 <span className="offer__rating-value rating__value">{rating}</span>
@@ -112,7 +112,7 @@ export default function OfferPage ({comments, authorizationStatus}: OfferPagePro
                 </li>
               </ul>
               <div className="offer__price">
-                <b className="offer__price-value">{price}</b>
+                <b className="offer__price-value">&euro;{price}</b>
                 <span className="offer__price-text">&nbsp;night</span>
               </div>
               <div className="offer__inside">
@@ -147,14 +147,10 @@ export default function OfferPage ({comments, authorizationStatus}: OfferPagePro
                 </div>
                 <div className="offer__description">
                   <p className="offer__text">
-                A quiet cozy and picturesque that hides behind a a river by the
-                unique lightness of Amsterdam. The building is green and from
-                18th century.
+                    {description}
                   </p>
                   <p className="offer__text">
-                An independent House, strategically located between Rembrand
-                Square and National Opera, but where the bustle of the city
-                comes to rest in this alley flowery and colorful.
+                    {description}
                   </p>
                 </div>
               </div>
@@ -170,7 +166,7 @@ export default function OfferPage ({comments, authorizationStatus}: OfferPagePro
           </div>
           <Map
             className='offer__map'
-            city={city}
+            city={currentCity}
             offers={offers}
             activeOffer={offerId}
           />
@@ -196,7 +192,7 @@ export default function OfferPage ({comments, authorizationStatus}: OfferPagePro
                 <div className="place-card__info">
                   <div className="place-card__price-wrapper">
                     <div className="place-card__price">
-                      <b className="place-card__price-value">{price}</b>
+                      <b className="place-card__price-value">&euro;{price}</b>
                       <span className="place-card__price-text">/&nbsp;night</span>
                     </div>
                     <button

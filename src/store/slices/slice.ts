@@ -1,16 +1,16 @@
-import { TOffer } from '../../types/types';
-import { CITIES_LOCATION, CityName } from '../../const';
+import { TCity, TOffer} from '../../types/types';
+import { CITIES_LOCATION} from '../../const';
 import { offers } from '../../mocks/mock';
 import { PayloadAction,createSlice } from '@reduxjs/toolkit';
 
 
 type OffersState = {
-    city: CityName;
+    currentCity: TCity;
     offers: TOffer[];
 }
 
 const initialState: OffersState = {
-  city: CITIES_LOCATION[0].name,
+  currentCity: CITIES_LOCATION[0],
   offers,
 };
 
@@ -19,12 +19,12 @@ export const offersSlice = createSlice({
   initialState,
   name: 'offers',
   reducers: {
-    setCity: (state, action: PayloadAction<CityName>) => {
-      state.city = action.payload;
+    setCurrentCity: (state, action: PayloadAction<TCity>) => {
+      state.currentCity = action.payload;
     },
   },
   selectors: {
-    city: (state: OffersState) => state.city,
+    currentCity: (state: OffersState) => state.currentCity,
     offers: (state: OffersState) => state.offers,
   }
 });

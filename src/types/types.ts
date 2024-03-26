@@ -40,3 +40,10 @@ export type TComment = {
     comment: string;
     rating: number;
 }
+
+export type TSort = {
+    Popular: string;
+    LowToHigh: string;
+    HighToLow: string;
+    TopRated: string;
+}

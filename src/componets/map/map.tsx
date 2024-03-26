@@ -6,6 +6,7 @@ import { ACTIVE_MARKER_ICON, DEFAULT_MARKER_ICON} from './const';
 import { Nullable } from 'vitest';
 import 'leaflet/dist/leaflet.css';
 
+
 type MapProps = {
     city: TCity;
     offers: TOffer[];
@@ -17,7 +18,6 @@ export default function Map ({city, offers, activeOffer, className}: MapProps): 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const map = useMap({location: city.location, mapRef: mapContainerRef});
   const markerLayer = useRef<LayerGroup>(leaflet.layerGroup());
-
 
   useEffect(()=> {
     if(map) {
