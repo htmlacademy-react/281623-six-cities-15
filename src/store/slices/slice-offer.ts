@@ -4,20 +4,20 @@ import { FullOffer, TOffer } from '../../types/types';
 import { fetchNearBy, fetchOffer } from '../thunk/offers-api';
 
 
-type OfferState = {
+type OfferPageState = {
     info: FullOffer[] | null;
     nearby: TOffer[];
     status: RequestStatus;
 }
 
-const initialState: OfferState = {
+const initialState: OfferPageState = {
   info: null,
   nearby: [],
   status: RequestStatus.Idle,
 };
 
 
-export const offerSlice = createSlice({
+export const offerPageSlice = createSlice({
   extraReducers: (builder) =>
     builder
       .addCase(fetchOffer.fulfilled, (state, action) => {
@@ -42,11 +42,12 @@ export const offerSlice = createSlice({
     }
   },
   selectors: {
-    nearByOffer: (state: OfferState) => state.nearby,
-    offer: (state: OfferState) => state.info,
-    offerStatus: (state: OfferState) => state.status,
+    nearByOffer: (state: OfferPageState) => state.nearby,
+    offerPage: (state: OfferPageState) => state.info,
+    offerPageStatus: (state: OfferPageState) => state.status,
   }
 });
 
-export const offerAction = offerSlice.actions;
-export const offerSelector = offerSlice.selectors;
+export const offerPageAction = offerPageSlice.actions;
+export const { clear } = offerPageSlice.actions;
+export const offerPageSelector = offerPageSlice.selectors;

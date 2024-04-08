@@ -62,6 +62,6 @@ export type FullOffer = {
     bedrooms: number;
     goods: string[];
     host: THost;
-    image: string[];
+    images: string[];
     maxAdults: number;
 }
